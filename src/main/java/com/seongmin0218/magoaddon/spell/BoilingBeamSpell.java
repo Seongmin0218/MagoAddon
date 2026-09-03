@@ -21,10 +21,15 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import io.redspace.ironsspellbooks.damage.DamageSources;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+
+import java.util.Optional;
 
 public class BoilingBeamSpell extends AbstractSpell {
 
-    private static final float RANGE = 14.0f;
+    public static final float RANGE = 14.0f;
 
     /*
      * 빔 중심부용 파란 Dust 파티클.
@@ -120,6 +125,26 @@ public class BoilingBeamSpell extends AbstractSpell {
         if (!(level instanceof ServerLevel serverLevel)) {
             return;
         }
+        /*
+        * 지속 물 분사 사운드.
+        *
+        * 매 tick 틀면 사운드가 겹쳐서 난리가 나므로
+        * 8 tick, 약 0.4초마다 작게 반복한다.
+        */
+        if (caster.tickCount % 8 == 0) {
+            level.playSound(
+                    null,
+                    caster.blockPosition(),
+                    SoundEvents.GENERIC_SPLASH,
+                    SoundSource.PLAYERS,
+                    0.35f,
+                    1.35f
+                            +
+                    level.random.nextFloat()
+                            *
+                    0.12f
+            );
+        }
 
         /*
          * 파티클을 매 tick 생성하면 너무 조밀하므로
@@ -153,6 +178,27 @@ public class BoilingBeamSpell extends AbstractSpell {
                     serverLevel,
                     end
             );
+
+            /*
+            * 명중점 증기 소리.
+            *
+            * 이것도 매 tick 울리면 너무 시끄러우므로
+            * 10 tick마다 한 번.
+            */
+            if (caster.tickCount % 10 == 0) {
+                level.playSound(
+                        null,
+                        BlockPos.containing(end),
+                        SoundEvents.GENERIC_EXTINGUISH_FIRE,
+                        SoundSource.PLAYERS,
+                        0.30f,
+                        1.65f
+                                +
+                        level.random.nextFloat()
+                                *
+                        0.20f
+                );
+            }
         }
     }
 
@@ -363,31 +409,57 @@ public class BoilingBeamSpell extends AbstractSpell {
      * 빔이 블록이나 엔티티에 닿는 위치의 증기.
      */
     private void spawnImpactSteam(
-            ServerLevel level,
-            Vec3 hitPosition
+        ServerLevel level,
+        Vec3 hitPosition
     ) {
+        /*
+        * 고온 증기
+        *
+        * 퍼지는 범위를 크게 잡아
+        * 물줄기가 뜨거운 표면/적에게 부딪히는 느낌.
+        */
         level.sendParticles(
                 ParticleTypes.CLOUD,
                 hitPosition.x,
                 hitPosition.y,
                 hitPosition.z,
-                5,
-                0.18,
-                0.18,
-                0.18,
-                0.025
+                10,
+                0.20,
+                0.20,
+                0.20,
+                0.08
         );
 
+        /*
+        * 튀어 나가는 물방울.
+        *
+        * speed를 높여서 기존보다 훨씬 강하게 튄다.
+        */
         level.sendParticles(
                 ParticleTypes.SPLASH,
                 hitPosition.x,
                 hitPosition.y,
                 hitPosition.z,
-                3,
-                0.12,
-                0.12,
-                0.12,
-                0.04
+                12,
+                0.24,
+                0.24,
+                0.24,
+                0.18
+        );
+
+        /*
+        * 작은 물방울 잔여물.
+        */
+        level.sendParticles(
+                ParticleTypes.DRIPPING_WATER,
+                hitPosition.x,
+                hitPosition.y,
+                hitPosition.z,
+                4,
+                0.16,
+                0.10,
+                0.16,
+                0.02
         );
     }
 
@@ -420,6 +492,7 @@ public class BoilingBeamSpell extends AbstractSpell {
         /*
          * 실제 발화 여부를 눈으로 확인하기 쉽게
          * 작은 불꽃도 생성.
+         * 안어울려서 취소.
         
         level.sendParticles(
                 ParticleTypes.FLAME,
@@ -433,6 +506,17 @@ public class BoilingBeamSpell extends AbstractSpell {
                 0.02
         );
         */
+    }
+
+    @Override
+    public Optional<net.minecraft.sounds.SoundEvent> getCastStartSound() {
+        return Optional.of(
+                SoundEvents.GENERIC_SPLASH
+        );
+    }
+    @Override
+    public Optional<net.minecraft.sounds.SoundEvent> getCastFinishSound() {
+        return Optional.empty();
     }
 
     /**
