@@ -21,6 +21,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import io.redspace.ironsspellbooks.damage.DamageSources;
 
 public class BoilingBeamSpell extends AbstractSpell {
 
@@ -187,9 +188,10 @@ public class BoilingBeamSpell extends AbstractSpell {
              * Iron's 주문 데미지 소스를 사용한다.
              */
             boolean damaged =
-                    target.hurt(
-                            getDamageSource(caster),
-                            damage
+                    DamageSources.applyDamage(
+                            target,
+                            damage,
+                            getDamageSource(caster)
                     );
 
             if (damaged) {

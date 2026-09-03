@@ -87,10 +87,9 @@ configurations {
 }
 
 dependencies {
-    // Iron's Spells 'n Spellbooks API for compilation.
-    compileOnly "io.redspace:irons_spellbooks:${irons_spells_version}:api"
+    compileOnly "io.redspace:irons_spellbooks:${irons_spells_version}"
+    compileOnly "io.redspace:irons_lib:${irons_lib_version}"
 
-    // Full Iron's runtime for development runs. These are not bundled into MagoAddon.
     localRuntime "io.redspace:irons_spellbooks:${irons_spells_version}"
     localRuntime "io.redspace:irons_lib:${irons_lib_version}"
 }
