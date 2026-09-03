@@ -19,6 +19,9 @@ public final class MagoSpells {
     public static final Supplier<AbstractSpell> TEST_SPELL =
             registerSpell(new TestSpell());
 
+    public static final Supplier<AbstractSpell> BOILING_BEAM =
+        registerSpell(new BoilingBeamSpell());
+
     private static Supplier<AbstractSpell> registerSpell(AbstractSpell spell) {
         return SPELLS.register(
                 spell.getSpellName(),
