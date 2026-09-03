@@ -3,7 +3,6 @@ package com.seongmin0218.magoaddon.spell;
 import com.seongmin0218.magoaddon.MagoAddon;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
-import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
@@ -50,7 +49,12 @@ public class BoilingBeamSpell extends AbstractSpell {
     private final DefaultConfig defaultConfig =
             new DefaultConfig()
                     .setMinRarity(SpellRarity.COMMON)
-                    .setSchoolResource(SchoolRegistry.FIRE_RESOURCE)
+                    .setSchoolResource(
+                        ResourceLocation.fromNamespaceAndPath(
+                            "aces_spell_utils",
+                            "hydro"
+                        )
+                    )
                     .setMaxLevel(5)
                     .setCooldownSeconds(3)
                     .build();
@@ -416,7 +420,7 @@ public class BoilingBeamSpell extends AbstractSpell {
         /*
          * 실제 발화 여부를 눈으로 확인하기 쉽게
          * 작은 불꽃도 생성.
-         */
+        
         level.sendParticles(
                 ParticleTypes.FLAME,
                 center.x,
@@ -428,6 +432,7 @@ public class BoilingBeamSpell extends AbstractSpell {
                 target.getBbWidth() * 0.25,
                 0.02
         );
+        */
     }
 
     /**
